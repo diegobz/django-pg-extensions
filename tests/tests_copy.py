@@ -8,7 +8,7 @@ from datetime import datetime
 import unittest
 import csv
 from mock import patch
-from djangopg.copy import (_convert_to_csv_form, copy_insert,
+from djangopg.copy import (_convert_to_csv_form, copy,
                            _send_csv_to_postgres)
 from tests.data import Poll, Choice
 
@@ -65,22 +65,22 @@ class ColumnsTestCase(unittest.TestCase):
         ]
 
     def test_all_non_pk_columns_are_used_if_none_specified(self, pmock):
-        copy_insert(Poll, self.entries)
+        copy(Poll, self.entries)
         columns = pmock.call_args[0][3]
         self.assertEqual(len(columns), 2)
 
     def test_specified_columns_only_are_used(self, pmock):
-        copy_insert(Poll, self.entries, columns=['question'])
+        copy(Poll, self.entries, columns=['question'])
         columns = pmock.call_args[0][3]
         self.assertEqual(len(columns), 1)
         self.assertEqual(columns[0], 'question')
 
-        copy_insert(Poll, self.entries, columns=['pub_date'])
+        copy(Poll, self.entries, columns=['pub_date'])
         columns = pmock.call_args[0][3]
         self.assertEqual(len(columns), 1)
         self.assertEqual(columns[0], 'pub_date')
 
-        copy_insert(Poll, self.entries, columns=['question', 'pub_date'])
+        copy(Poll, self.entries, columns=['question', 'pub_date'])
         columns = pmock.call_args[0][3]
         self.assertEqual(len(columns), 2)
         self.assertEqual(columns[0], 'question')
@@ -93,14 +93,14 @@ class CsvTestCase(unittest.TestCase):
 
     def test_csf_generated_number_of_lines(self, pmock):
         p = Poll(question='Q')
-        copy_insert(Poll, [p])
+        copy(Poll, [p])
         fd = pmock.call_args[0][0]
         lines = fd.readlines()
         self.assertEqual(len(lines), 1)
 
     def test_csf_generated_is_valid(self, pmock):
         p = Poll(question='Q')
-        copy_insert(Poll, [p])
+        copy(Poll, [p])
         fd = pmock.call_args[0][0]
         csvf = csv.reader(fd)
         rows = [row for row in csvf]
@@ -115,7 +115,7 @@ class ForeingKeyFieldTestCase(unittest.TestCase):
     def test_actual_foreign_key_value_is_extracted_correctly(self, pmock):
         p = Poll(pk=1)
         c = Choice(poll=p, choice_text='Text', votes=0)
-        copy_insert(Choice, [c])
+        copy(Choice, [c])
         fd = pmock.call_args[0][0]
         csvf = csv.reader(fd)
         rows = [row for row in csvf]
