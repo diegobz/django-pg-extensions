@@ -14,3 +14,10 @@ Just run
     django-admin.py test --settings=djangopg.test_settings
 
 from the root directory.
+
+If you are running it within a virtualenv, it might be necessary to 
+make your top-level dir of the repo available in your $PYTHONPATH 
+with the following command, if you are in the top-level dir:
+
+    add2virtualenv `pwd`
+
