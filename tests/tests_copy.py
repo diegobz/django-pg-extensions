@@ -10,7 +10,7 @@ import csv
 from mock import patch
 from djangopg.copy import (_convert_to_csv_form, copy,
                            _send_csv_to_postgres)
-from tests.data import Poll, Choice
+from tests.models import Poll, Choice
 
 
 
