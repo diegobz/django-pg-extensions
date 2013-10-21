@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 from django.db import models
 from django.utils.encoding import smart_unicode
 
@@ -23,6 +24,8 @@ class ArrayField(models.Field):
             # The check for empty strings is needed, because to_python
             # is called on empty constructors.
             return None
+        if isinstance(value, basestring):
+            value = json.loads(value)
         if not isinstance(value, list):
             raise TypeError("Expected list, got %s" % type(value))
         return value
